@@ -1,42 +1,41 @@
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class Client1 {
-
     public static void main(String[] args) {
-        String serverName = "localhost";
-        int port = 8080;
-
         try {
-            System.out.println("Connecting to " + serverName + " on port " + port);
-            Socket client = new Socket(serverName, port);
+            Socket socket = new Socket("localhost", 5555);
+            Scanner scanner = new Scanner(socket.getInputStream());
+            PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
 
-            System.out.println("Connected to " + client.getRemoteSocketAddress());
+            // Round 1
+            printWriter.println("1 Ace (1), Hearts");
 
-            ObjectOutputStream out = new ObjectOutputStream(client.getOutputStream());
-            ObjectInputStream in = new ObjectInputStream(client.getInputStream());
+            // Round 2
+            printWriter.println("2 2, Hearts");
 
-            // Round 1: send card
-            out.writeObject(new Card(Card.Rank.ACE, Card.Suit.HEARTS));
+            // Round 3
+            printWriter.println("3 5, Hearts");
 
-            // Round 5: send card
-            out.writeObject(new Card(Card.Rank.QUEEN, Card.Suit.HEARTS));
+            // Round 4
+            printWriter.println("4 6, Hearts");
 
-            // Round 6: send card
-            out.writeObject(new Card(Card.Rank.THREE, Card.Suit.HEARTS));
+            // Round 5
+            printWriter.println("5 Queen (12), Hearts");
 
-            // Round 8: send card
-            out.writeObject(new Card(Card.Rank.KING, Card.Suit.HEARTS));
+            // Round 6
+            printWriter.println("6 3, Hearts");
 
-            // Wait for server response
-            System.out.println("Waiting for server response...");
-            String response = (String) in.readObject();
-            System.out.println(response);
+            // Round 7
+            printWriter.println("7 4, Hearts");
 
-            client.close();
-        } catch (IOException | ClassNotFoundException e) {
+            // Round 8
+            printWriter.println("8 13, Hearts");
+
+            socket.close();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
