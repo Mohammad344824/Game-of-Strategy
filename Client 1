@@ -1,0 +1,43 @@
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+
+public class Client1 {
+
+    public static void main(String[] args) {
+        String serverName = "localhost";
+        int port = 8080;
+
+        try {
+            System.out.println("Connecting to " + serverName + " on port " + port);
+            Socket client = new Socket(serverName, port);
+
+            System.out.println("Connected to " + client.getRemoteSocketAddress());
+
+            ObjectOutputStream out = new ObjectOutputStream(client.getOutputStream());
+            ObjectInputStream in = new ObjectInputStream(client.getInputStream());
+
+            // Round 1: send card
+            out.writeObject(new Card(Card.Rank.ACE, Card.Suit.HEARTS));
+
+            // Round 5: send card
+            out.writeObject(new Card(Card.Rank.QUEEN, Card.Suit.HEARTS));
+
+            // Round 6: send card
+            out.writeObject(new Card(Card.Rank.THREE, Card.Suit.HEARTS));
+
+            // Round 8: send card
+            out.writeObject(new Card(Card.Rank.KING, Card.Suit.HEARTS));
+
+            // Wait for server response
+            System.out.println("Waiting for server response...");
+            String response = (String) in.readObject();
+            System.out.println(response);
+
+            client.close();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+}
