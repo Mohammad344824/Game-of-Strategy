@@ -1,0 +1,64 @@
+import java.util.ArrayList;
+import java.util.List;
+
+public class Server {
+    private List<Client> clients;
+    private int[] scoreCard;
+    private int numRounds;
+
+    public Server(List<Client> clients) {
+        this.clients = clients;
+        this.scoreCard = new int[clients.size()];
+        this.numRounds = 0;
+    }
+
+    public void playGame() {
+        System.out.println("Starting the game...");
+        while (numRounds < 8) {
+            int maxCardValue = -1;
+            int maxCardIndex = -1;
+
+            // Pick a card from the deck
+            int cardValue = (int) (Math.random() * 13) + 1;
+            String cardSuit = getSuit();
+
+            // Display the card picked
+            System.out.println("Round " + (numRounds + 1) + ": The server picks (" + cardValue + ", " + cardSuit + ")");
+
+            // Ask each client to choose a card
+            for (int i = 0; i < clients.size(); i++) {
+                Card card = clients.get(i).chooseCard();
+                System.out.println("Client " + (i + 1) + " sends (" + card.getValue() + ", " + card.getSuit() + ")");
+                if (card.getValue() > maxCardValue) {
+                    maxCardValue = card.getValue();
+                    maxCardIndex = i;
+                }
+            }
+
+            // Increment the score of the winning client
+            scoreCard[maxCardIndex] += cardValue;
+
+            // Display the winner of the round and the updated scorecard
+            System.out.println("Winner of the round: Client " + (maxCardIndex + 1) + " (since it sent the highest value card among all clients)");
+            displayScoreCard();
+            System.out.println();
+
+            // Increment the number of rounds played
+            numRounds++;
+        }
+    }
+
+    private String getSuit() {
+        String[] suits = {"Spades", "Hearts", "Diamonds", "Clubs"};
+        int index = (int) (Math.random() * 4);
+        return suits[index];
+    }
+
+    private void displayScoreCard() {
+        System.out.println("Scorecard table after Round " + numRounds + ":");
+        System.out.printf("%-6s%-15s%-15s%-15s\n", "Round", "Client 1 score", "Client 2 score", "Client 3 score");
+        for (int i = 0; i <= numRounds; i++) {
+            System.out.printf("%-6d%-15d%-15d%-15d\n", i, scoreCard[0], scoreCard[1], scoreCard[2]);
+        }
+    }
+}
