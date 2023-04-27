@@ -1,79 +1,29 @@
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-public class Server {
-    private List<Card> deck;
-    private int client1Score;
-    private int client2Score;
-    private int client3Score;
-
-    public Server() {
-        deck = new ArrayList<>();
-        client1Score = 0;
-        client2Score = 0;
-        client3Score = 0;
-
-        // create the deck of cards
-        for (int i = 1; i <= 13; i++) {
-            deck.add(new Card(i, "Hearts"));
-            deck.add(new Card(i, "Diamonds"));
-            deck.add(new Card(i, "Clubs"));
-            deck.add(new Card(i, "Spades"));
-        }
-
-        // shuffle the deck
-        Collections.shuffle(deck);
-    }
-
-    public void playRound() {
-        // pick a card from the deck
-        Card serverCard = deck.remove(0);
-
-        // receive cards from clients
-        Card client1Card = receiveCardFromClient(1);
-        Card client2Card = receiveCardFromClient(2);
-        Card client3Card = receiveCardFromClient(3);
-
-        // determine the winner of the round
-        int winner = determineRoundWinner(client1Card, client2Card, client3Card);
-
-        // update scores
-        if (winner == 1) {
-            client1Score += serverCard.getValue();
-        } else if (winner == 2) {
-            client2Score += serverCard.getValue();
-        } else {
-            client3Score += serverCard.getValue();
-        }
-
-        // print the scorecard
-        printScorecard();
-    }
-
-    private Card receiveCardFromClient(int clientId) {
-        // simulate receiving a card from the client
-        // for simplicity, we'll just return a random card from the deck
-        Card card = deck.remove(0);
-        System.out.println("Client " + clientId + " sent " + card.toString());
-        return card;
-    }
-
-    private int determineRoundWinner(Card card1, Card card2, Card card3) {
-        if (card1.getValue() >= card2.getValue() && card1.getValue() >= card3.getValue()) {
-            return 1;
-        } else if (card2.getValue() >= card1.getValue() && card2.getValue() >= card3.getValue()) {
-            return 2;
-        } else {
-            return 3;
-        }
-    }
-
-    private void printScorecard() {
-        System.out.println("Round " + (client1Score + client2Score + client3Score + 1) + ":");
-        System.out.println("Client 1 score: " + client1Score);
-        System.out.println("Client 2 score: " + client2Score);
-        System.out.println("Client 3 score: " + client3Score);
-        System.out.println();
-    }
-}
+import random
+import socket
+# Define the server's address and port
+SERVER_ADDRESS = '127.0.0.1'
+SERVER_PORT = 12345
+# Define the number of rounds in the game
+NUM_ROUNDS = 13
+# Define the possible card values and suits
+CARD_VALUES = [str(i) for i in range(1, 14)]
+CARD_SUITS = ['Hearts', 'Diamonds', 'Clubs', 'Spades']
+# Create a deck of cards
+DECK = [f"{value} of {suit}" for value in CARD_VALUES for suit in CARD_SUITS]
+# Create a dictionary to store scores
+scores = {}
+# Create a list to store client sockets
+client_sockets = []
+# Create a socket for the server
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.bind((SERVER_ADDRESS, SERVER_PORT))
+server_socket.listen(3) # Accept up to 3 client connections
+print("Server is ready to accept connections...\n")
+# Accept connections from clients
+for i in range(3):
+ client_socket, client_address = server_socket.accept()
+ print(f"Client {i + 1} connected from {client_address}")
+ client_sockets.append(client_socket)
+ scores[client_socket] = 0 # Initialize score for this client to 0
+print("All clients connected. Starting the game...\n")
+# Play the game for the specified number of rounds
